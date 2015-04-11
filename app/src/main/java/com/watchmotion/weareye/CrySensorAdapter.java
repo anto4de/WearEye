@@ -12,9 +12,9 @@ public class CrySensorAdapter extends SequenceSensorAdapter {
 
     private SoundDetector soundDetector;
 
-    public CrySensorAdapter(SequenceGestureHandler<?, ?> handler) {
+    public CrySensorAdapter(SequenceGestureHandler<?, ?> handler, int threshold) {
         super(handler);
-        this.soundDetector = new SoundDetector(this);
+        this.soundDetector = new SoundDetector(this, threshold);
     }
 
     @Override
