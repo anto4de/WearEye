@@ -31,7 +31,7 @@ public class MainCameraActivity extends Activity implements GoogleApiClient.Conn
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main_camera);
         mSurface = (SurfaceView) findViewById(R.id.msurface);
         preview = (ImageView) findViewById(R.id.preview);
         tv = (TextView) findViewById(R.id.bitmapInfo);
