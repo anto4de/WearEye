@@ -2,15 +2,11 @@ package com.watchmotion.weareye;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.WearableListenerService;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MyWearListener extends WearableListenerService {
 
@@ -27,8 +23,6 @@ public class MyWearListener extends WearableListenerService {
     };
 
     private LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
-
-    private List<BitmapListener> listeners = new ArrayList<>();
 
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
@@ -52,12 +46,6 @@ public class MyWearListener extends WearableListenerService {
            // notifyListeners(tempBitmap);
         }
         super.onMessageReceived(messageEvent);
-    }
-
-    private void notifyListeners(Bitmap bitmap) {
-        for (BitmapListener listener : listeners) {
-            listener.callback(bitmap);
-        }
     }
 
 }
