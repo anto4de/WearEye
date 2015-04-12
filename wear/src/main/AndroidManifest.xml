@@ -1,9 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.watchmotion.weareye">
-    <uses-feature android:name="android.hardware.type.watch" />
-    <application android:allowBackup="true" android:label="@string/app_name"
-        android:icon="@mipmap/ic_launcher" android:theme="@android:style/Theme.DeviceDefault">
 
+    <uses-feature android:name="android.hardware.type.watch" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@android:style/Theme.DeviceDefault">
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+        <activity
+            android:name=".MainWearActivity"
+            android:label="@string/title_activity_main_wear">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <service android:name=".MyWearListener">
+            <intent-filter>
+                <action android:name="com.google.android.gsm.wearable.BIND_LISTENER" />
+            </intent-filter>
+
+        </service>
     </application>
 
 </manifest>
