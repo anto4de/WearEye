@@ -17,11 +17,20 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.NodeApi;
+import com.google.android.gms.wearable.Wearable;
 
-public class MainActivity extends Activity {
+
+public class MainActivity extends Activity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private final static long DEFAULT_VIBRATION_DURATION = 1000;
     private final static long ANIM_INTERVAL = 600;
@@ -50,6 +59,10 @@ public class MainActivity extends Activity {
             mHandler.postDelayed(calibrateThreshold, ANIM_INTERVAL);
         }
     };
+
+    private GoogleApiClient gClient;
+    private boolean googleConnected = false;
+    private Node mWearableNode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,6 +136,15 @@ public class MainActivity extends Activity {
         pulseCry.register(new CryListener());
 
         v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        gClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(Wearable.API).build();
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        //connect google client
+        gClient.connect();
     }
 
     @Override
@@ -147,6 +169,31 @@ public class MainActivity extends Activity {
     protected void onStop() {
         super.onStop();
         releaseCameraAndPreview();
+        //disconnect googleClient
+        gClient.disconnect();
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        mPreview.setGoogleClient(gClient);
+        mPreview.setGoogleConnected(true);
+        googleConnected = true;
+        findWearableNode();
+
+        Toast.makeText(getApplicationContext(), "connected", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        mPreview.setGoogleClient(null);
+        mPreview.setGoogleConnected(false);
+
+        Toast.makeText(getApplicationContext(), "disconnected", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
     }
 
     private class CryListener implements PulseGestureListener {
@@ -156,6 +203,10 @@ public class MainActivity extends Activity {
 
             if (event.getType() == PulseGestureEvent.PULSE_START_EVENT_TYPE) {
                 v.vibrate(DEFAULT_VIBRATION_DURATION);
+                if (googleConnected && gClient != null && mWearableNode != null) {
+                    Wearable.MessageApi.sendMessage(
+                            gClient, mWearableNode.getId(), "/path/camera/start", "Cry Event".getBytes());
+                }
             }
         }
     }
@@ -185,6 +236,21 @@ public class MainActivity extends Activity {
         if (mPreview != null) {
             mPreview.destroyDrawingCache();
         }
+    }
+
+    void findWearableNode() {
+        PendingResult<NodeApi.GetConnectedNodesResult> nodes = Wearable.NodeApi.getConnectedNodes(gClient);
+        nodes.setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
+            @Override
+            public void onResult(NodeApi.GetConnectedNodesResult result) {
+                if (result.getNodes().size() > 0) {
+                    mWearableNode = result.getNodes().get(0);
+                    //if(D) Log.d(TAG, "Found wearable: name=" + mWearableNode.getDisplayName() + ", id=" + mWearableNode.getId());
+                } else {
+                    mWearableNode = null;
+                }
+            }
+        });
     }
 
 }

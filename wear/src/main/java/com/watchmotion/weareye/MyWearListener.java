@@ -1,9 +1,8 @@
 package com.watchmotion.weareye;
 
-import android.app.Service;
 import android.content.Intent;
-import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
+import android.widget.Toast;
 
 import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.MessageEvent;
@@ -12,6 +11,7 @@ import com.google.android.gms.wearable.WearableListenerService;
 
 public class MyWearListener extends WearableListenerService {
     LocalBroadcastManager localBroadcastManager;
+
     public MyWearListener() {
     }
 
@@ -19,7 +19,6 @@ public class MyWearListener extends WearableListenerService {
     public void onCreate() {
         super.onCreate();
         localBroadcastManager = LocalBroadcastManager.getInstance(this);
-
     }
 
     @Override
@@ -29,12 +28,17 @@ public class MyWearListener extends WearableListenerService {
 
     @Override
     public void onDataChanged(DataEventBuffer dataEvents) {
-        super.onDataChanged(dataEvents);
+
     }
 
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
-        super.onMessageReceived(messageEvent);
+        if (messageEvent.getPath().equals("/path/camera/start")) {
+            Toast.makeText(this, "Start received!", Toast.LENGTH_SHORT).show();
+            Intent startIntent = new Intent(this, MainWearActivity.class);
+            startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(startIntent);
+        }
     }
 
     @Override
