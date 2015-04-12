@@ -39,7 +39,6 @@ public class SoundMeter {
             try {
                 mRecorder.prepare();
             } catch (IllegalStateException | IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
 

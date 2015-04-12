@@ -4,9 +4,9 @@ import io.snapback.sdk.gesture.sequence.pulse.PulseGestureEvent;
 import io.snapback.sdk.gesture.sequence.pulse.PulseGestureHandler;
 import io.snapback.sdk.gesture.sequence.pulse.PulseGestureListener;
 
+import android.app.Activity;
 import android.hardware.Camera;
 import android.os.Handler;
-import android.support.v7.app.ActionBarActivity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Vibrator;
@@ -21,7 +21,7 @@ import android.widget.TextView;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends Activity {
 
     private final static long DEFAULT_VIBRATION_DURATION = 1000;
     private final static long ANIM_INTERVAL = 600;
@@ -57,14 +57,13 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        // Set screen brightness to minimum for this activity.
-        //WindowManager.LayoutParams lp = getWindow().getAttributes();
-        //lp.screenBrightness = 0.0f;
-        //getWindow().setAttributes(lp);
-
-        safeCameraOpen(Camera.CameraInfo.CAMERA_FACING_BACK);
+        // Setting screen brightness.
+        WindowManager.LayoutParams lp = getWindow().getAttributes();
+        lp.screenBrightness = 0.0f;
+        getWindow().setAttributes(lp);
 
         cameraPreview = (SurfaceView) findViewById(R.id.camera_preview);
+        safeCameraOpen(Camera.CameraInfo.CAMERA_FACING_BACK);
         mPreview = new Preview(this, cameraPreview, mCamera);
 
         micButton = (ImageView) findViewById(R.id.calibrate_button);
@@ -99,13 +98,14 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
-        ImageView camButton = (ImageView) findViewById(R.id.cam_button);
+        final ImageView camButton = (ImageView) findViewById(R.id.cam_button);
         camButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         cameraPreview.setVisibility(View.VISIBLE);
+                        YoYo.with(Techniques.Pulse).duration(ANIM_INTERVAL).playOn(camButton);
                         YoYo.with(Techniques.FadeIn).duration(ANIM_INTERVAL).playOn(cameraPreview);
                         break;
                     case MotionEvent.ACTION_UP:
@@ -143,6 +143,12 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        releaseCameraAndPreview();
+    }
+
     private class CryListener implements PulseGestureListener {
 
         @Override
@@ -160,7 +166,7 @@ public class MainActivity extends ActionBarActivity {
             releaseCameraAndPreview();
             mCamera = Camera.open(id);
 
-            qOpened = (mCamera != null);
+            qOpened = true;
         } catch (Exception e) {
             Log.e(getString(R.string.app_name), "failed to open Camera");
             e.printStackTrace();
