@@ -4,12 +4,15 @@ import io.snapback.sdk.gesture.sequence.pulse.PulseGestureEvent;
 import io.snapback.sdk.gesture.sequence.pulse.PulseGestureHandler;
 import io.snapback.sdk.gesture.sequence.pulse.PulseGestureListener;
 
+import android.hardware.Camera;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.util.Log;
 import android.view.MotionEvent;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -28,6 +31,10 @@ public class MainActivity extends ActionBarActivity {
     private Handler mHandler = new Handler();
     private SoundMeter mSoundMeter = new SoundMeter();
     private int mThreshold = 7;
+
+    private Camera mCamera;
+    private Preview mPreview;
+    private SurfaceView cameraPreview;
 
     private ImageView micButton;
     private TextView calibrateTextView;
@@ -55,6 +62,11 @@ public class MainActivity extends ActionBarActivity {
         //lp.screenBrightness = 0.0f;
         //getWindow().setAttributes(lp);
 
+        safeCameraOpen(Camera.CameraInfo.CAMERA_FACING_BACK);
+
+        cameraPreview = (SurfaceView) findViewById(R.id.camera_preview);
+        mPreview = new Preview(this, cameraPreview, mCamera);
+
         micButton = (ImageView) findViewById(R.id.calibrate_button);
         calibrateTextView = (TextView) findViewById(R.id.calibrating_textview);
 
@@ -81,6 +93,23 @@ public class MainActivity extends ActionBarActivity {
                         if (!pulseCry.isStarted()) {
                             pulseCry.start();
                         }
+                        break;
+                }
+                return true;
+            }
+        });
+
+        ImageView camButton = (ImageView) findViewById(R.id.cam_button);
+        camButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        cameraPreview.setVisibility(View.VISIBLE);
+                        YoYo.with(Techniques.FadeIn).duration(ANIM_INTERVAL).playOn(cameraPreview);
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        YoYo.with(Techniques.FadeOut).duration(ANIM_INTERVAL).playOn(cameraPreview);
                         break;
                 }
                 return true;
@@ -122,6 +151,33 @@ public class MainActivity extends ActionBarActivity {
             if (event.getType() == PulseGestureEvent.PULSE_START_EVENT_TYPE) {
                 v.vibrate(DEFAULT_VIBRATION_DURATION);
             }
+        }
+    }
+
+    private boolean safeCameraOpen(int id) {
+        boolean qOpened = false;
+        try {
+            releaseCameraAndPreview();
+            mCamera = Camera.open(id);
+
+            qOpened = (mCamera != null);
+        } catch (Exception e) {
+            Log.e(getString(R.string.app_name), "failed to open Camera");
+            e.printStackTrace();
+        }
+
+        return qOpened;
+    }
+
+
+    private void releaseCameraAndPreview() {
+        if (mCamera != null) {
+            mCamera.stopPreview();
+            mCamera.release();
+            mCamera = null;
+        }
+        if (mPreview != null) {
+            mPreview.destroyDrawingCache();
         }
     }
 

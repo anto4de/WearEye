@@ -38,7 +38,7 @@ public class MainCameraActivity extends Activity implements GoogleApiClient.Conn
 
         safeCameraOpen(Camera.CameraInfo.CAMERA_FACING_BACK);
 
-        mPreview = new Preview(this, mSurface, mCamera, preview, tv);
+        mPreview = new Preview(this, mSurface, mCamera);
         gClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(Wearable.API).build();
 
 

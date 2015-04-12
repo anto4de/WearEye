@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ffffffff" >
+    android:background="#ff000000" >
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -36,6 +36,13 @@
         android:visibility="invisible"
         android:textSize="30sp"
         android:fontFamily="sans-serif-condensed"
+        android:layout_centerInParent="true"/>
+
+    <SurfaceView
+        android:id="@+id/camera_preview"
+        android:layout_width="320dp"
+        android:layout_height="320dp"
+        android:visibility="invisible"
         android:layout_centerInParent="true"/>
 
 </RelativeLayout>

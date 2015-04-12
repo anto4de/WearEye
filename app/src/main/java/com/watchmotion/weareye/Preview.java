@@ -65,26 +65,22 @@ public class Preview extends ViewGroup implements SurfaceHolder.Callback {
     private List<String> mSupportedFlashModes;
 
     // View holding this camera.
-    private View mCameraView;
     private Context mContext;
-    private ImageView preview;
     int currentCamera;
-    TextView bitmapInfo;
     public int mCameraOrientation;
 
     public boolean googleConnected = false;
     public GoogleApiClient gClient = null;
     private Node mWearableNode = null;
 
-    public void setGoogleConnected(boolean con){
+    public void setGoogleConnected(boolean con) {
         googleConnected = con;
         findWearableNode();
     }
-    Preview(Context context, SurfaceView surfaceView, Camera camera, ImageView img, TextView tv) {
+
+    Preview(Context context, SurfaceView surfaceView, Camera camera) {
         super(context);
         mContext = context;
-        preview = img;
-        bitmapInfo = tv;
         mSurfaceView = surfaceView;
         //mSurfaceView.setLayerType(View.LAYER_TYPE_HARDWARE,null);
         setCamera(camera);
@@ -100,7 +96,7 @@ public class Preview extends ViewGroup implements SurfaceHolder.Callback {
         nodes.setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
             @Override
             public void onResult(NodeApi.GetConnectedNodesResult result) {
-                if(result.getNodes().size()>0) {
+                if (result.getNodes().size() > 0) {
                     mWearableNode = result.getNodes().get(0);
                     //if(D) Log.d(TAG, "Found wearable: name=" + mWearableNode.getDisplayName() + ", id=" + mWearableNode.getId());
                 } else {
@@ -199,9 +195,7 @@ public class Preview extends ViewGroup implements SurfaceHolder.Callback {
                     //Bitmap bmpSmallRotated = Bitmap.createBitmap(bmpSmall, 0, 0, smallWidth, smallHeight, matrix, false);
                     // String tempString = "previus: " + bmpSmall.getByteCount();
 
-                    if(googleConnected && gClient!= null && mWearableNode != null) {
-
-                        bitmapInfo.setText("google connected gClient valid");
+                    if (googleConnected && gClient != null && mWearableNode != null) {
 
                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
                         bmpSmall.compress(Bitmap.CompressFormat.WEBP, 30, baos);
@@ -210,11 +204,7 @@ public class Preview extends ViewGroup implements SurfaceHolder.Callback {
                                 gClient, mWearableNode.getId(), cameraPreviewPAth, baos.toByteArray()).setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
                             @Override
                             public void onResult(MessageApi.SendMessageResult sendMessageResult) {
-                                if (!sendMessageResult.getStatus().isSuccess()) {
-                                    bitmapInfo.setText("bitmap delivered");
-                                }else{
-                                    bitmapInfo.setText("bitmap not delivered");
-                                }
+
                             }
                         });
                         /*
@@ -224,13 +214,12 @@ public class Preview extends ViewGroup implements SurfaceHolder.Callback {
                         PutDataRequest request = dataMap.asPutDataRequest();
                         PendingResult<DataApi.DataItemResult> pendingResult = Wearable.DataApi.putDataItem(gClient,request);
                         DataApi.DataItemResult result = pendingResult.await();*/
-                    }else{
-                        bitmapInfo.setText("problem with goole connection");
+                    } else {
+
                     }
 
 
                     // Bitmap tempBitmap = BitmapFactory.decodeByteArray(baos.toByteArray(), 0, baos.toByteArray().length);
-                    preview.setImageBitmap(bmpSmall);
 /*
                     tempString = tempString + "\n later: " + tempBitmap.getByteCount();
                     bitmapInfo.setText(tempString);*/
@@ -341,7 +330,7 @@ public class Preview extends ViewGroup implements SurfaceHolder.Callback {
             }
 
             final int scaledChildHeight = previewHeight * width / previewWidth;
-            mCameraView.layout(0, height - scaledChildHeight, width, height);
+            //mCameraView.layout(0, height - scaledChildHeight, width, height);
         }
     }
 
@@ -406,9 +395,12 @@ public class Preview extends ViewGroup implements SurfaceHolder.Callback {
 
     }
 
-    public void setGoogleClient(GoogleApiClient client){
+    public void setGoogleClient(GoogleApiClient client) {
         this.gClient = client;
-    };
+    }
+
+    ;
+
     /* to be used on wearable
     public Bitmap loadBitmapFromAsset(Asset asset) {
         if (asset == null) {
@@ -442,12 +434,13 @@ public class Preview extends ViewGroup implements SurfaceHolder.Callback {
         }
         return results;
     }*/
-    private List<String> getNodes(){
+    private List<String> getNodes() {
         final ArrayList<String> mResults = new ArrayList<String>();
-        /*NodeApi.GetConnectedNodesResult mNodes =*/ Wearable.NodeApi.getConnectedNodes(gClient).setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
+        /*NodeApi.GetConnectedNodesResult mNodes =*/
+        Wearable.NodeApi.getConnectedNodes(gClient).setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
             @Override
             public void onResult(NodeApi.GetConnectedNodesResult getConnectedNodesResult) {
-                for(Node mNode : getConnectedNodesResult.getNodes()){
+                for (Node mNode : getConnectedNodesResult.getNodes()) {
                     mResults.add(mNode.getId());
                 }
             }
