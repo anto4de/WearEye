@@ -1,32 +1,36 @@
 package com.watchmotion.weareye;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.util.Log;
+import android.os.Handler;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.MessageEvent;
-import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
-
-import java.io.InputStream;
-import java.util.concurrent.TimeUnit;
 
 public class MyWearListener extends WearableListenerService {
     private final static String commandPath = "/path/camera/start";
 
+    private boolean receiving = true;
+
+    private Handler mHandler = new Handler();
+    private Runnable vibrationTask = new Runnable() {
+        public void run() {
+            receiving = true;
+        }
+    };
+
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
 
-        if (messageEvent.getPath().equals(commandPath)) {
-            Toast.makeText(this, "Start received!", Toast.LENGTH_SHORT).show();
-            Intent startIntent = new Intent(this, MainWearActivity.class);
-            startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(startIntent);
-        }
+        if (receiving)
+            if (messageEvent.getPath().equals(commandPath)) {
+                //Toast.makeText(this, "Start received!", Toast.LENGTH_SHORT).show();
+                receiving = false;
+                mHandler.postDelayed(vibrationTask, 60000);
+                Intent startIntent = new Intent(this, WakeActivity.class);
+                startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(startIntent);
+            }
         super.onMessageReceived(messageEvent);
     }
 
