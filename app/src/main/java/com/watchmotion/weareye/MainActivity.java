@@ -36,16 +36,12 @@ public class MainActivity extends ActionBarActivity {
     // Create runnable thread to calibrate the threshold
     private Runnable calibrateThreshold = new Runnable() {
         public void run() {
-
             YoYo.with(Techniques.Pulse).duration(ANIM_INTERVAL).playOn(micButton);
-
             double amp = mSoundMeter.getAmplitude();
             if ((amp > mThreshold)) {
                 mThreshold = (int) amp;
             }
-
             mHandler.postDelayed(calibrateThreshold, ANIM_INTERVAL);
-
         }
     };
 
@@ -92,7 +88,6 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
-
         pulseCry = new PulseGestureHandler(this);
         pulseCry.setUsageTrackingDetails("m3rcur14l@hotmail.com", "WearEye");
         CrySensorAdapter cry = new CrySensorAdapter(pulseCry, mThreshold);
@@ -129,7 +124,6 @@ public class MainActivity extends ActionBarActivity {
                 v.vibrate(DEFAULT_VIBRATION_DURATION);
             }
         }
-
     }
 
 }
