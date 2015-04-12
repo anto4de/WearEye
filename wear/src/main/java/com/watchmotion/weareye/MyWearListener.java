@@ -8,6 +8,9 @@ import android.support.v4.content.LocalBroadcastManager;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.WearableListenerService;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MyWearListener extends WearableListenerService {
 
     private final static String commandPath = "/path/camera/start";
