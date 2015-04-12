@@ -11,7 +11,7 @@ import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.widget.ImageView;
 
-public class StartActivity extends Activity implements BitmapListener {
+public class StartActivity extends Activity {
 
     private ImageView cameraView;
     private BroadcastReceiver broadcastReceiver;
@@ -52,10 +52,5 @@ public class StartActivity extends Activity implements BitmapListener {
                 cameraView.setImageBitmap(b);
             }
         });
-    }
-
-    @Override
-    public void callback(Bitmap b) {
-        setBipmap(b);
     }
 }
