@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.watchmotion.weareye">
 
+    <uses-permission android:name="android.permission.VIBRATE"/>
     <uses-feature android:name="android.hardware.type.watch" />
 
     <application
@@ -24,7 +25,7 @@
 
         <service android:name=".MyWearListener">
             <intent-filter>
-                <action android:name="com.google.android.gsm.wearable.BIND_LISTENER" />
+                <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
             </intent-filter>
 
         </service>

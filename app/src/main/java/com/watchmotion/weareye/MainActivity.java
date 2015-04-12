@@ -25,6 +25,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
@@ -60,9 +61,10 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
         }
     };
 
-    private GoogleApiClient gClient;
+    private GoogleApiClient gClient = null;
     private boolean googleConnected = false;
-    private Node mWearableNode;
+    private Node mWearableNode = null;
+    private final static String commandPath = "/path/camera/start";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +83,7 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
 
         micButton = (ImageView) findViewById(R.id.calibrate_button);
         calibrateTextView = (TextView) findViewById(R.id.calibrating_textview);
+        gClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(Wearable.API).build();
 
         micButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -136,7 +139,6 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
         pulseCry.register(new CryListener());
 
         v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-        gClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(Wearable.API).build();
 
     }
 
@@ -187,13 +189,13 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
     public void onConnectionSuspended(int i) {
         mPreview.setGoogleClient(null);
         mPreview.setGoogleConnected(false);
-
+        googleConnected = false;
         Toast.makeText(getApplicationContext(), "disconnected", Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-
+        googleConnected = false;
     }
 
     private class CryListener implements PulseGestureListener {
@@ -205,11 +207,19 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
                 v.vibrate(DEFAULT_VIBRATION_DURATION);
                 if (googleConnected && gClient != null && mWearableNode != null) {
                     Wearable.MessageApi.sendMessage(
-                            gClient, mWearableNode.getId(), "/path/camera/start", "Cry Event".getBytes());
+                            gClient, mWearableNode.getId(), commandPath, null).setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
+                        @Override
+                        public void onResult(MessageApi.SendMessageResult sendMessageResult) {
+                            if(sendMessageResult.getStatus().isSuccess())
+                            Toast.makeText(getApplicationContext(),"message sent",Toast.LENGTH_SHORT).show();
+                            else Toast.makeText(getApplicationContext(),"message not sent",Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             }
         }
     }
+
 
     private boolean safeCameraOpen(int id) {
         boolean qOpened = false;
