@@ -2,6 +2,7 @@ package com.watchmotion.weareye;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
@@ -35,6 +36,7 @@ public class WakeActivity extends Activity implements GoogleApiClient.Connection
             @Override
             public void onClick(View v) {
                 mHandler.removeCallbacks(vibrationTask);
+                startActivity(new Intent(WakeActivity.this,MainListActivity.class));
                 finish();
             }
         });
