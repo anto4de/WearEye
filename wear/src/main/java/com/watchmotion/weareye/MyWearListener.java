@@ -4,8 +4,13 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
+import android.widget.Toast;
 
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.MessageEvent;
+import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
 import java.util.ArrayList;
@@ -29,8 +34,8 @@ public class MyWearListener extends WearableListenerService {
 
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
-
-        if (receiving)
+        super.onMessageReceived(messageEvent);
+        if (receiving) {
             if (messageEvent.getPath().equals(commandPath)) {
                 //Toast.makeText(this, "Start received!", Toast.LENGTH_SHORT).show();
                 receiving = false;
@@ -39,16 +44,45 @@ public class MyWearListener extends WearableListenerService {
                 startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(startIntent);
             }
+        }
         if (messageEvent.getPath().equals(cameraPreviewPath)) {
             byte[] data = messageEvent.getData();
            // final Bitmap tempBitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
             Intent intent = new Intent("Bitmap");
             intent.putExtra("IMAGE",data);
+
             localBroadcastManager.sendBroadcast(intent);
 
            // notifyListeners(tempBitmap);
         }
-        super.onMessageReceived(messageEvent);
+
+    }
+
+    @Override
+    public void onPeerConnected(Node peer) {
+        super.onPeerConnected(peer);
+        Log.e("WEAR_LISTENER", peer.getDisplayName()+" CONNECTED");
+    }
+
+    @Override
+    public void onPeerDisconnected(Node peer) {
+        super.onPeerDisconnected(peer);
+        Log.e("WEAR_LISTENER", peer.getDisplayName() +" disconnected");
+    }
+
+    private GoogleApiClient gClient;
+
+    public MyWearListener() {
+
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        gClient = new GoogleApiClient.Builder(this).addApi(Wearable.API).build();
+        gClient.connect();
+
+
     }
 
 }

@@ -3,6 +3,7 @@ package com.watchmotion.weareye;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -17,20 +18,20 @@ public class MyWearEyeService extends WearableListenerService {
     GoogleApiClient mClient;
     public boolean connected = false;
     private final String TAG = this.getClass().getSimpleName();
-    private final static String cameraPreviewPAth = "path/camera/preview";
+    private final static String CANTO = "path/canto";
+
+    private LocalBroadcastManager lManager;
 
     public MyWearEyeService() {
     }
 
-    public MyWearEyeService(GoogleApiClient mC) {
-        mClient = mC;
-    }
 
     @Override
     public void onCreate() {
         super.onCreate();
         mClient = new GoogleApiClient.Builder(this).addApi(Wearable.API).build();
         mClient.connect();
+        lManager = LocalBroadcastManager.getInstance(this);
     }
 
     @Override
@@ -42,6 +43,13 @@ public class MyWearEyeService extends WearableListenerService {
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
         super.onMessageReceived(messageEvent);
+            if (messageEvent.getPath().equals(CANTO)) {
+
+                Intent startIntent = new Intent(this, BuonanotteActivity.class);
+                startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(startIntent);
+
+        }
     }
 
     @Override

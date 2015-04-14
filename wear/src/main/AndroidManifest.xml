@@ -3,7 +3,6 @@
     package="com.watchmotion.weareye">
 
     <uses-permission android:name="android.permission.VIBRATE" />
-
     <uses-feature android:name="android.hardware.type.watch" />
 
     <application
@@ -15,22 +14,20 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
+        <service android:name=".MyWearListener">
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
+            </intent-filter>
+        </service>
+
         <activity
             android:name=".WakeActivity"
             android:label="@string/title_activity_main_wear">
-
-            </activity>
+        </activity>
 
         <activity
             android:name=".MainListActivity"
             android:label="@string/title_activity_main_wear">
-
-            </activity>
-
-        <activity
-            android:name=".StartActivity"
-            android:label="@string/title_activity_start">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -38,11 +35,12 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".MyWearListener">
-            <intent-filter>
-                <action android:name="com.google.android.gsm.wearable.BIND_LISTENER" />
-            </intent-filter>
-        </service>
+        <activity
+            android:name=".StartActivity"
+            android:label="@string/title_activity_start">
+        </activity>
+
+
 
 
     </application>

@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -200,7 +201,10 @@ public class Preview extends ViewGroup implements SurfaceHolder.Callback {
                                 gClient, mWearableNode.getId(), cameraPreviewPAth, baos.toByteArray()).setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
                             @Override
                             public void onResult(MessageApi.SendMessageResult sendMessageResult) {
-
+                                if(sendMessageResult.getStatus().isSuccess())
+                                Toast.makeText(mContext,"data sent",Toast.LENGTH_SHORT).show();
+                                else
+                                    Toast.makeText(mContext,"data not sent",Toast.LENGTH_SHORT).show();
                             }
                         });
                         /*

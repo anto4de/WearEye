@@ -11,16 +11,19 @@
         android:id="@+id/circle"
         android:layout_height="50dp"
         android:layout_width="50dp"
+        android:gravity="center_vertical"
+        android:paddingStart="15dp"
         android:src="@drawable/ic_action_camera"/>
     <TextView
         android:id="@+id/name"
         android:layout_gravity="center_vertical"
         android:text="ciao"
-        android:layout_width="wrap_content"
+        android:gravity="center_vertical"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif-condensed-light"
         android:lineSpacingExtra="-4sp"
         android:textColor="@color/text_color"
-        android:textSize="22sp"/>
+        android:textSize="24sp"/>
     </LinearLayout>
 </com.watchmotion.weareye.WearableListItemLayout>

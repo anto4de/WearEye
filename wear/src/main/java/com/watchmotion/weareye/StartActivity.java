@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 public class StartActivity extends Activity {
 
@@ -34,6 +35,12 @@ public class StartActivity extends Activity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
         LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, new IntentFilter("Bitmap"));
@@ -41,8 +48,14 @@ public class StartActivity extends Activity {
 
     @Override
     protected void onStop() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
         super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
+        super.onDestroy();
+
     }
 
     public void setBipmap(final Bitmap b) {
