@@ -285,11 +285,9 @@ public class Preview extends ViewGroup implements SurfaceHolder.Callback {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        // Source: http://stackoverflow.com/questions/7942378/android-camera-will-not-work-startpreview-fails
         final int width = resolveSize(getSuggestedMinimumWidth(), widthMeasureSpec);
         final int height = resolveSize(getSuggestedMinimumHeight(), heightMeasureSpec);
         setMeasuredDimension(width, height);
-
         if (mSupportedPreviewSizes != null) {
             mPreviewSize = getOptimalPreviewSize(mSupportedPreviewSizes, width, height);
         }
@@ -334,28 +332,35 @@ public class Preview extends ViewGroup implements SurfaceHolder.Callback {
         }
     }
 
-    private Camera.Size getOptimalPreviewSize(List<Camera.Size> sizes, int width, int height) {
-        // Source: http://stackoverflow.com/questions/7942378/android-camera-will-not-work-startpreview-fails
-        Camera.Size optimalSize = null;
-
+    private Camera.Size getOptimalPreviewSize(List<Camera.Size> sizes, int w, int h) {
         final double ASPECT_TOLERANCE = 0.1;
-        double targetRatio = (double) height / width;
+        double targetRatio=(double)h / w;
 
-        // Try to find a size match which suits the whole screen minus the menu on the left.
+        if (sizes == null) return null;
+
+        Camera.Size optimalSize = null;
+        double minDiff = Double.MAX_VALUE;
+
+        int targetHeight = h;
+
         for (Camera.Size size : sizes) {
-
-            if (size.height != width) continue;
             double ratio = (double) size.width / size.height;
-            if (ratio <= targetRatio + ASPECT_TOLERANCE && ratio >= targetRatio - ASPECT_TOLERANCE) {
+            if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) continue;
+            if (Math.abs(size.height - targetHeight) < minDiff) {
                 optimalSize = size;
+                minDiff = Math.abs(size.height - targetHeight);
             }
         }
 
-        // If we cannot find the one that matches the aspect ratio, ignore the requirement.
         if (optimalSize == null) {
-            // TODO : Backup in case we don't get a size.
+            minDiff = Double.MAX_VALUE;
+            for (Camera.Size size : sizes) {
+                if (Math.abs(size.height - targetHeight) < minDiff) {
+                    optimalSize = size;
+                    minDiff = Math.abs(size.height - targetHeight);
+                }
+            }
         }
-
         return optimalSize;
     }
 
